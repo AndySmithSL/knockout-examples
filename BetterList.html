@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="./main.css" >
+    <title>Knockout - Better List</title>
+</head>
+<body>
+    
+    <div class='liveExample'>
+        <form data-bind="submit: addItem">
+            Add Item: <input type="text" data-bind='value: itemToAdd, valueUpdate: "afterkeydown"'/>
+            <button type="submit" data-bind='enable: itemToAdd().length > 0'>Add</button>
+        </form>
+
+        <p>Your values:</p>
+        <select multiple="multiple" height="5" data-bind="options: allItems, selectedOptions: selectedItems"></select>
+
+        <div>
+            <button data-bind="click: removeSelected, enable: selectedItems().length > 0">Remove</button>
+            <button data-bind="click: sortItems, enable: allItems().length > 1">Sort</button>
+        </div>
+       
+    </div>
+    
+    <script type='text/javascript' src='knockout-3.5.0.js'></script>
+    <script>
+
+        var BetterListModel = function() {
+            this.itemToAdd = ko.observable("");
+            this.allItems = ko.observableArray(["Fries", "Eggs Benedict", "Ham", "Cheese"]);
+            this.selectedItems = ko.observableArray([]);
+
+            // Behaviour
+            this.addItem = () => {
+                if((this.itemToAdd().length > 0) && (this.allItems.indexOf(this.itemToAdd()) < 0)) {
+                    this.allItems.push(this.itemToAdd());   // Add to items
+                    this.itemToAdd("");                     // Clear text box
+                }
+            };
+
+            this.removeSelected = () => {
+                this.allItems.removeAll(this.selectedItems());
+                this.selectedItems([]);
+            }
+
+            this.sortItems = () => this.allItems.sort();
+        };
+
+        ko.applyBindings(new BetterListModel());
+
+    </script>
+</body>
+</html>

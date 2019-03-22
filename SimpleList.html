@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="./main.css" >
+    <title>Knockout - Simple List</title>
+</head>
+<body>
+    
+    <div class='liveExample'>
+        <form data-bind='submit: addItem'>
+            New Item:
+            <input data-bind='value: itemToAdd, valueUpdate: "afterkeydown"' />
+            <button type='submit' data-bind='enable: itemToAdd().length > 0'>Add</button>
+            <p>Your Items:</p>
+            <select multiple='multiple' width='50' data-bind='options: items'></select>
+        </form>
+    </div>
+    
+    <script type='text/javascript' src='knockout-3.5.0.js'></script>
+    <script>
+
+        var SimpleListModel = function(items) {
+            this.items = ko.observableArray(items);
+            this.itemToAdd = ko.observable("");
+            this.addItem = () => {
+                if(this.itemToAdd().length > 0) {
+                    this.items.push(this.itemToAdd());
+                    this.itemToAdd("");
+                };
+            }
+            this.itemToAdd.bind(this);
+        };
+
+        ko.applyBindings(new SimpleListModel(["Alpha", "Beta", "Charlie"]));
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="./main.css" >
+    <title>Knockout - Working with Collections</title>
+</head>
+<body>
+    
+    <div class='liveExample'>
+        <h2>People</h2>
+        <ul data-bind="foreach: people">
+            <li>
+                <div>
+                    <span data-bind="text: name"></span> has <span data-bind="text: children().length">&nbsp;</span> children:
+                    <a data-bind="click: addChild" href='#'>Add child</a>
+                    <span class='renderTime' data-bind="visible: $root.showRenderTimes">
+                        (person rendered at <span data-bind="text: new Date().getSeconds()" > </span>)
+                    </span>
+                </div>
+                <ul data-bind="foreach: children">
+                    <li>
+                        <span data-bind="text: $data"> </span>
+                        <span class='renderTime' data-bind="visible: $root.showRenderTimes">
+                            (child rendered at <span data-bind="text: new Date().getSeconds()"> </span>)
+                        </span>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+        <label><input type='checkbox' data-bind="checked: showRenderTimes" /> Show render times</label> 
+    </div>
+    
+    <script type='text/javascript' src='knockout-3.5.0.js'></script>
+    <script>
+
+        var Person = function(name, children) {
+            this.name = name;
+            this.children = ko.observableArray(children);
+
+            this.addChild = () => {
+                this.children.push("New Child");
+            };
+        };
+
+        var viewModel = {
+            people: [
+                new Person("Annabelle", ["Arnie", "Anders", "Apple"]),
+                new Person("Bertie", ["Bryony", "Briana", "Brian", "Billy"]),
+                new Person("Charles", ["Clint", "Clare"])
+            ],
+            showRenderTimes: ko.observable(false)
+        };
+
+        ko.applyBindings(viewModel);
+
+    </script>
+</body>
+</html>

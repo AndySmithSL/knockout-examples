@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="./main.css" >
+    <title>Knockout - Click Counter</title>
+</head>
+<body>
+    
+    <div class='liveExample'>
+        <div>You've clicked <span data-bind='text: numberOfClicks'>&nbsp;</span> times</div>
+
+        <button data-bind='click: registerClick, disable: hasClickedTooManyTimes'>Click Me</button>
+
+        <div data-bind='visible: hasClickedTooManyTimes'>
+            <p>That's too many clicks! Please Stop!</p>
+            <button data-bind='click: resetClicks'>Reset</button>
+        </div>
+
+    </div>
+    
+    <script type='text/javascript' src='knockout-3.5.0.js'></script>
+    <script>
+
+        var ClickCounterViewModel = function() {
+            this.numberOfClicks = ko.observable(0);
+            this.registerClick = () => this.numberOfClicks(this.numberOfClicks() + 1);
+            this.resetClicks = () => this.numberOfClicks(0);
+            this.hasClickedTooManyTimes = ko.pureComputed(() => this.numberOfClicks() >= 3, this);
+        };
+
+        ko.applyBindings(new ClickCounterViewModel());
+
+    </script>
+</body>
+</html>

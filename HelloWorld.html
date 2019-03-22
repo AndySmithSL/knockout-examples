@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="./main.css" >
+    <title>Knockout - HelloWorld</title>
+</head>
+<body>
+    <div class='liveExample'>
+        <p>First name: <input data-bind="value: firstName" /></p>
+        <p>Last name: <input data-bind="value: lastName" /></p>
+        <h2>Hello, <span data-bind="text: fullName"> </span>!</h2>
+    </div>
+
+    <script type='text/javascript' src='knockout-3.5.0.js'></script>
+    <script>
+
+        var ViewModel = function(first, last) {
+            this.firstName = ko.observable(first);
+            this.lastName = ko.observable(last);
+
+            this.fullName = ko.pureComputed(function() {
+                return this.firstName() + " " + this.lastName();
+            }, this);
+        }
+
+        ko.applyBindings(new ViewModel("Planet", "Earth"));
+
+    </script>
+</body>
+</html>
