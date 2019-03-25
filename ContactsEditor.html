@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="./contactsEditor.css" >
+    <title>Knockout - Paged Grid</title>
+</head>
+<body>
+    <div class='liveExample'> 
+    
+        <h2>Contacts</h2>
+        <div id='contactsList'>
+            <table class='contactsEditor'>
+                <tr>
+                    <th>First name</th>
+                    <th>Last name</th>
+                    <th>Phone numbers</th>
+                </tr>
+                <tbody data-bind='foreach: contacts'>
+                    <tr>
+                        <td>
+                            <input data-bind='value: firstName' />
+                            <div><a href='#' data-bind='click: $root.removeContact'>Delete</a></div>
+                        </td>
+                        <td><input data-bind='value: lastName' /></td>
+                        <td>
+                            <table>
+                                <tbody data-bind='foreach: phones'>
+                                    <tr>
+                                        <td><input data-bind='value: type' /></td>
+                                        <td><input data-bind='value: number' /></td>
+                                        <td><a href='#' data-bind='click: $root.removePhone'>Delete</a></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <a href='#' data-bind='click: $root.addPhone'>Add number</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+         
+        <p>
+            <button data-bind='click: addContact'>Add a contact</button>
+            <button data-bind='click: save, enable: contacts().length > 0'>Save to JSON</button>
+        </p>
+         
+        <textarea data-bind='value: lastSavedJSON' rows='5' cols='60' disabled='disabled'> </textarea>
+        
+    </div>
+    
+    <script type='text/javascript' src='knockout-3.5.0.js'></script>
+    <script type='text/javascript' src='simpleGrid.js'></script>
+
+    <script>
+
+        var initialData = [
+            { firstName: "Danny", lastName: "LaRusso", phones: [
+                { type: "Mobile", number: "(555) 121-2121" },
+                { type: "Home", number: "(555) 123-4567"}]
+            },
+            { firstName: "Sensei", lastName: "Miyagi", phones: [
+                { type: "Mobile", number: "(555) 444-2222" },
+                { type: "Home", number: "(555) 999-1212"}]
+            }
+        ];
+
+        var contactsModel = function(contacts) {
+
+            var self = this;
+
+            self.contacts = ko.observableArray(ko.utils.arrayMap(contacts, (contact) => {
+                return {
+                    firstName: contact.firstName, 
+                    lastName: contact.lastName, 
+                    phones: ko.observableArray(contact.phones)
+                }                                       
+            }));
+
+            self.addContact = () => self.contacts.push({ firstName: "", lastName: "", phones: ko.observableArray()});
+
+            self.removeContact = c => self.contacts.remove(c);
+
+            self.addPhone = contact => contact.phones.push({ type: "", number: "" });
+
+            self.removePhone = phone => $.each(self.contacts(), () => this.phones.remove(phone));
+
+            self.lastSavedJSON = ko.observable("");
+
+            self.save = () => self.lastSavedJSON(JSON.stringify(ko.toJS(self.contacts), null, 2));
+
+        };
+        
+        ko.applyBindings(new contactsModel(initialData));
+        
+    </script>
+</body>
+</html>
