@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="./contactsEditor.css" >
+    <title>Knockout - Cart Editor</title>
+</head>
+<body>
+    <div class='liveExample'> 
+        <table width='100%'>
+            <thead>
+                <tr>
+                    <th width='25%'>Category</th>
+                    <th width='25%'>Product</th>
+                    <th class='price' width='15%'>Price</th>
+                    <th class='quantity' width='10%'>Quantity</th>
+                    <th class='price' width='15%'>Subtotal</th>
+                    <th width='10%'> </th>
+                </tr>
+            </thead>
+            <tbody data-bind='foreach: lines'>
+                <tr>
+                    <td>
+                        <select data-bind='options: $root.sampleProductCategories, value: category, optionsText: "name", optionsCaption: "Select..."'></select>
+                    </td>
+                    <td>
+                        <select data-bind='options: products, value: $parent.product, optionsText: "name", optionsCaption: "Select...", '></select>
+                    </td>
+                    <td class='price'>
+                        <span> </span>
+                    </td>
+                    <td class='quantity'>
+                        <input />
+                    </td>
+                    <td class='price'>
+                        <span > </span>
+                    </td>
+                    <td>
+                        <a href='#'>Remove</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <p><span data-bind='text: chosenCategory'></span></p>
+        <p class='grandTotal'>
+            Total value: <span data-bind='formatCurrency(grandTotal())'> </span>
+        </p>
+        <button>Add product</button>
+        <button>Submit order</button>
+    </div>
+    
+    <script type='text/javascript' src='knockout-3.5.0.js'></script>
+    <script type='text/javascript' src='simpleGrid.js'></script>
+
+    <script>
+
+        function formatCurrency(value) {
+            return "$" + value.toFixed(2);
+        }
+
+        var CartLine = function() {
+            var self = this;
+
+            self.category = ko.observable();
+            self.product = ko.observable();
+            self.quantity = ko.observable(1);
+            self.subtotal = ko.pureComputed(() => self.product() ? self.product().price * parseInt("0" + self.quantity(), 10) : 0);
+
+            // Whenever the category changes, reset the product selection
+            self.category.subscribe(() => self.product(undefined));
+
+            self.products = self.category().products;
+        };
+
+        var Cart = function() {
+            // Stores an array of lines, and from these, can work out the grandTotal
+            var self = this;
+            self.lines = ko.observableArray([ new CartLine() ]);
+
+            self.grandTotal = ko.pureComputed(() => {
+                var total = 0;
+                $.each(self.lines(), () => total += this.subtotal); //TODO: experiment
+                return total;
+            });
+
+            // Operations
+            self.addLine = () => self.lines.push(new CartLine());
+            self.removeLine = (line) => self.lines.remove(line);
+            self.save = () => {
+                var dataToSave = $.map(self.lines(), l => l.product() ? { productName: l.product().name, quantity: l.quantity() } : undefined);
+                alert("Could now send this to the server: " + JSON.stringify(dataToSave));
+            };
+
+            // Product Data
+            self.sampleProductCategories = [
+                { 
+                    name: "Classic Cars", 
+                    value: 0,
+                    products: [
+                        { name: "Porche" },
+                        { name: "Bentley" },
+                        { name: "Mercedes" },
+                        { name: "Rolls Royce" }
+                    ]
+                },
+                { 
+                    name: "Motorcycles", 
+                    value: 1,
+                    products: [
+                        { name1: "Honda" },
+                        { name1: "Ducati" },
+                        { name1: "Yamaha" },
+                        { name1: "Suzuki" },
+                        { name1: "Harley Davidson" }
+                    ]
+                },
+                { 
+                    name: "Planes", 
+                    value: 2,
+                    products: [
+                        { name: "Boeing" },
+                        { name1: "Airbus" },
+                        { name1: "Tupolev" },
+                        { name1: "Bombardier" }
+                    ]
+                }
+            ];
+
+        }
+
+        ko.applyBindings(new Cart());
+
+    </script>
+</body>
+</html>

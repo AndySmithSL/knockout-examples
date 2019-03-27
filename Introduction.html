@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="./contactsEditor.css" >
+    <title>Knockout - Grid Editor</title>
+</head>
+<body>
+    <div> 
+        <p>First Name: <input data-bind='value: firstName' /></p>
+        <p>Last Name: <input data-bind='value: lastName' /></p>
+        <p>Full name: <strong data-bind="text: fullName"></strong></p>
+        <button data-bind="click: capitalizeLastName">Go caps</button>
+    </div>
+    
+    <script type='text/javascript' src='knockout-3.5.0.js'></script>
+    <script type='text/javascript' src='simpleGrid.js'></script>
+
+    <script>
+
+        function AppViewModel() {
+            this.firstName = ko.observable("Bert");
+            this.lastName = ko.observable("Bertington");
+
+            this.fullName = ko.computed(() => this.firstName() + " " + this.lastName());
+
+            this.capitalizeLastName = () => {
+                var current = this.lastName();
+                this.lastName(current.toUpperCase());
+            };
+        };
+
+        ko.applyBindings(new AppViewModel());
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="./contactsEditor.css" >
+    <title>Knockout - Grid Editor</title>
+</head>
+<body>
+    <div class='liveExample'> 
+        <form action='/someServerSideHandler'>
+            <p>You have asked for <span data-bind='text: gifts().length'>&nbsp;</span> gift(s)</p>
+            <table data-bind='visible: gifts().length > 0'>
+                <thead>
+                    <tr>
+                        <th>Gift name</th>
+                        <th>Price</th>
+                        <th />
+                    </tr>
+                </thead>
+                <tbody data-bind='foreach: gifts'>
+                    <tr>
+                        <td><input data-bind='value: name' class='required' /></td>
+                        <td><input data-bind='value: price' class='required number' /></td>
+                        <td><a href='#' data-bind='click: $root.removeGift'>Delete</a></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <button data-bind='click: addGift'>Add Gift</button>
+            <button data-bind='enable: gifts().length > 0' type='submit'>Submit</button>
+        </form>
+    </div>
+    
+    <script type='text/javascript' src='knockout-3.5.0.js'></script>
+    <script type='text/javascript' src='simpleGrid.js'></script>
+
+    <script>
+
+       var GiftModel = function(gifts) {
+           var self = this;
+           self.gifts = ko.observableArray(gifts);
+
+           // Behaviour
+           self.addGift = () => self.gifts.push({ name: "", price: "" });
+           self.removeGift = (gift) => self.gifts.remove(gift);
+           self.save = (form) => alert("Could now transmit to server: " + ko.utils.stringifyJson(self.gifts)); 
+
+       };
+
+       var viewModel = new GiftModel([
+            { name: "Tall Hat", price: "39.95" },
+            { name: "Long Cloak", price: "120.00" }
+       ]);
+
+       ko.applyBindings(viewModel);
+        
+       // Activate jQuery validation
+       $("form").validate({ submitHandler: viewModel.save });
+
+    </script>
+</body>
+</html>
