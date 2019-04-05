@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="./contactsEditor.css" >
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <title>Knockout - Cart Editor</title>
 </head>
 <body>
@@ -23,32 +24,31 @@
             <tbody data-bind='foreach: lines'>
                 <tr>
                     <td>
-                        <select data-bind='options: $root.sampleProductCategories, value: category, optionsText: "name", optionsCaption: "Select..."'></select>
+                        <select data-bind='options: sampleProductCategories, value: category, optionsText: "name", optionsCaption: "Select..."'></select>
                     </td>
-                    <td>
-                        <select data-bind='options: products, value: $parent.product, optionsText: "name", optionsCaption: "Select...", '></select>
+                    <td data-bind="with: category">
+                        <select data-bind='options: products, optionsText: "name", optionsCaption: "Select...", value: $parent.product'> </select>
                     </td>
-                    <td class='price'>
-                        <span> </span>
+                    <td class='price' data-bind='with: product'>
+                        <span data-bind='text: formatCurrency(price)'> </span>
                     </td>
                     <td class='quantity'>
-                        <input />
+                        <input data-bind='visible: product, value: quantity, valueUpdate: "afterkeydown"' />
                     </td>
                     <td class='price'>
-                        <span > </span>
+                        <span data-bind='visible: product, text: formatCurrency(subtotal())' > </span>
                     </td>
                     <td>
-                        <a href='#'>Remove</a>
+                        <a href='#' data-bind='click: $parent.removeLine'>Remove</a>
                     </td>
                 </tr>
             </tbody>
         </table>
-        <p><span data-bind='text: chosenCategory'></span></p>
         <p class='grandTotal'>
-            Total value: <span data-bind='formatCurrency(grandTotal())'> </span>
+            Total value: <span data-bind='text: formatCurrency(grandTotal())'> </span>
         </p>
-        <button>Add product</button>
-        <button>Submit order</button>
+        <button data-bind='click: addLine'>Add product</button>
+        <button data-bind='click: save'>Submit order</button>
     </div>
     
     <script type='text/javascript' src='knockout-3.5.0.js'></script>
@@ -71,7 +71,37 @@
             // Whenever the category changes, reset the product selection
             self.category.subscribe(() => self.product(undefined));
 
-            self.products = self.category().products;
+            // Product Data
+            self.sampleProductCategories = [
+                { 
+                    name: "Classic Cars", 
+                    products: [
+                        { name: "Porche",  price: 70 },                       
+                        { name: "Bentley", price: 25 },
+                        { name: "Mercedes", price: 54 },
+                        { name: "Rolls Royce", price: 40 }
+                    ]
+                },
+                { 
+                    name: "Motorcycles", 
+                    products: [
+                        { name: "Honda", price: 15 },
+                        { name: "Ducati", price: 20 },
+                        { name: "Yamaha", price: 14 },
+                        { name: "Suzuki", price: 12 },
+                        { name: "Harley Davidson", price: 25 }
+                    ]
+                },
+                { 
+                    name: "Planes", 
+                    products: [
+                        { name: "Boeing", price: 25 },
+                        { name: "Airbus", price: 24 },
+                        { name: "Tupolev", price: 10 },
+                        { name: "Bombardier", price: 12 }
+                    ]
+                }
+            ];
         };
 
         var Cart = function() {
@@ -81,7 +111,7 @@
 
             self.grandTotal = ko.pureComputed(() => {
                 var total = 0;
-                $.each(self.lines(), () => total += this.subtotal); //TODO: experiment
+                $.each(self.lines(), function() { total += this.subtotal()}); //TODO: experiment
                 return total;
             });
 
@@ -89,45 +119,9 @@
             self.addLine = () => self.lines.push(new CartLine());
             self.removeLine = (line) => self.lines.remove(line);
             self.save = () => {
-                var dataToSave = $.map(self.lines(), l => l.product() ? { productName: l.product().name, quantity: l.quantity() } : undefined);
+                var dataToSave = $.map(self.lines(), line => line.product() ? { productName: line.product().name, quantity: line.quantity() } : undefined);
                 alert("Could now send this to the server: " + JSON.stringify(dataToSave));
             };
-
-            // Product Data
-            self.sampleProductCategories = [
-                { 
-                    name: "Classic Cars", 
-                    value: 0,
-                    products: [
-                        { name: "Porche" },
-                        { name: "Bentley" },
-                        { name: "Mercedes" },
-                        { name: "Rolls Royce" }
-                    ]
-                },
-                { 
-                    name: "Motorcycles", 
-                    value: 1,
-                    products: [
-                        { name1: "Honda" },
-                        { name1: "Ducati" },
-                        { name1: "Yamaha" },
-                        { name1: "Suzuki" },
-                        { name1: "Harley Davidson" }
-                    ]
-                },
-                { 
-                    name: "Planes", 
-                    value: 2,
-                    products: [
-                        { name: "Boeing" },
-                        { name1: "Airbus" },
-                        { name1: "Tupolev" },
-                        { name1: "Bombardier" }
-                    ]
-                }
-            ];
-
         }
 
         ko.applyBindings(new Cart());
