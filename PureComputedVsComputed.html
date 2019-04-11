@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="./pagedGrid.css" >
+    <title>Knockout - Paged Grid</title>
+</head>
+<body>
+
+    <span data-bind="text: firstName"></span>
+    <span data-bind="text: lastName"></span>
+    
+    
+    <script type='text/javascript' src='knockout-3.5.0.js'></script>
+    <script type='text/javascript' src='simpleGrid.js'></script>
+
+    <script>
+
+    function ViewModel() {
+        var self = this;
+
+        self.firstName = ko.observable('Arshile');
+        self.lastName = ko.observable('Gorky');
+        self.pureComputedExecutions = 0;
+        self.computedExecutions = 0;
+
+        self.pureComputedFullName = ko.pureComputed(function() {
+            // This is NOT recommended 
+            self.pureComputedExecutions++;
+            return 'Hello ' + self.firstName() + ' ' + self.lastName();
+        });
+        self.computedFullName = ko.computed(function() {
+            self.computedExecutions++;
+
+            return 'Hello ' + self.firstName() + ' ' + self.lastName();
+        });
+    };
+    var viewModel = new ViewModel();
+    ko.applyBindings(viewModel);
+
+    alert('Pure computed executions: ' + viewModel.pureComputedExecutions);
+    alert('Computed executions: ' + viewModel.computedExecutions);
+        
+    </script>
+</body>
+</html>
